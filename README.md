@@ -1,3 +1,5 @@
+# WIP! DO NOT USE!  Wait a week or so :-)
+
 # Differential Privacy
 
 This library implements Global Differential Privacy that allows you to protect the privacy of any users (or entities) in some data set while still running any aggregations over their private data.  Differential attacks are ways to steal data from APIs and derive information about individual users through only aggregate information.  Differential privacy helps to prevent this while also enabling TRUE anonymization for sensitive user data.

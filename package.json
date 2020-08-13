@@ -2,7 +2,13 @@
   "name": "differential-privacy",
   "version": "0.0.1",
   "description": "Implements Global Differential Privacy for almost any numeric function",
-  "keywords": ["epsilon", "differential", "privacy", "global", "laplace"],
+  "keywords": [
+    "epsilon",
+    "differential",
+    "privacy",
+    "global",
+    "laplace"
+  ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "repository": {
