@@ -1,0 +1,51 @@
+{
+  "name": "differential-privacy",
+  "version": "0.0.1",
+  "description": "Implements Global Differential Privacy for almost any numeric function",
+  "keywords": ["epsilon", "differential", "privacy", "global", "laplace"],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gittyeric/differential-privacy"
+  },
+  "sideEffects": [
+    "./lib/index.js"
+  ],
+  "engineStrict": false,
+  "engines": {
+    "node": ">= 8.0.0"
+  },
+  "dependencies": {
+    "decimal.js": "^10.2.0",
+    "seedrandom": "^3.0.5"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.9",
+    "@types/node": "^8.10.61",
+    "@types/seedrandom": "^2.4.28",
+    "@types/uuid": "^3.4.4",
+    "jest": "^26.0.0",
+    "prettify": "^0.1.7",
+    "rimraf": "~2.6.2",
+    "ts-jest": "^26.2.0",
+    "tslib": "^2.0.1",
+    "tslint": "^5.9.1",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.9.7"
+  },
+  "scripts": {
+    "clean": "rimraf coverage lib tmp && prettier src/*.ts tests/*.ts examples/*.ts",
+    "build": "npm run clean && npm run build:ts-js && npm run build:ts-types",
+    "build:ts-js": "tsc -p tsconfig.json",
+    "build:ts-types": "tsc -p tsconfig.release.json",
+    "deploy-dry": "npm run build & npm run lint & npm run test && git status",
+    "watch": "tsc -w -p tsconfig.release.json",
+    "lint": "tslint -t stylish --project \"tsconfig.json\"",
+    "test": "tslint --fix --project \"tsconfig.json\" && npm run lint && npm run test-only",
+    "test-only": "jest --coverage --runInBand",
+    "test:watch": "jest --watchAll"
+  },
+  "author": "Eric <git@letsmakeit.com>",
+  "license": "MIT"
+}
