@@ -98,6 +98,10 @@ If the Big-O runtime of your sensitiveFunction is X and you have a constant time
 
 Finding a good maxEpsilon is currently not the easiest task.  You can turn on the debugDangerously flag in options to help determine a good tradeoff between a high epsilon for user privacy vs a low epsilon for lots of accurate queries.  Better tooling for finding good maxEpsilons is planned in the future.
 
+## Security / decimal.js Note
+
+This lib implements all real number operations using fixed-precision values from decimal.js.  This prevents known IEEE floating point attacks on the Laplace Mechanism.  If you're using decimal.js, beware that this library needs to mutate some decimal.js settings globally!  See src/index.ts for more.
+
 ## Feature Wish List
 
 Hey! Come contribute with a Pull Request!  Here's some ideas:
