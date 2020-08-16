@@ -21,8 +21,7 @@ export const random0to1Distribution: (elementCount: number) => ArrayView<number>
 }
 
 export const avgFunction: (elements: SequenceView<any, number>) => number = (elements) => {
-    let sum = 0
-    let count = 0
+    let [sum, count] = [0, 0]
     elements.forEach((e) => { sum += e; count++ })
     return sum / count
 }

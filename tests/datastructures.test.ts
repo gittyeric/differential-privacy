@@ -18,13 +18,13 @@ describe("ArrayView", () => {
         // .get
         src.forEach((e, i) => expect(e).toEqual(view.get(i)))
         
-        // .newSubsetIterator
-        view.newSubsetIterator().next()
+        // .newShadowIterator
+        view.newShadowIterator().next()
     }
 
     it("should handle empty arrays", () => {
         const emptyView = newArrayView([])
-        const iter = emptyView.newSubsetIterator()
+        const iter = emptyView.newShadowIterator()
         const next = iter.next()
         expect(next.done).toBe(true)
         expect(next.value).toBeUndefined()
@@ -37,7 +37,7 @@ describe("ArrayView", () => {
     it("should properly iterate over subsets", () => {
         const src = [1, 2, 3]
         const view = newArrayView(src)
-        const iter = view.newSubsetIterator()
+        const iter = view.newShadowIterator()
 
         const first = iter.next()
         expect(first.done).toBe(false)
@@ -88,13 +88,13 @@ describe("KeyValueView", () => {
         // .get
         view.forEach((e, i) => expect(e).toEqual(view.get(i)))
 
-        // .newSubsetIterator
-        view.newSubsetIterator().next()
+        // .newShadowIterator
+        view.newShadowIterator().next()
     }
 
     it("should handle empty associative arrays", () => {
         const emptyView = newKeyValueView({})
-        const iter = emptyView.newSubsetIterator()
+        const iter = emptyView.newShadowIterator()
         const next = iter.next()
         expect(next.done).toBe(true)
         expect(next.value).toBeUndefined()
@@ -107,7 +107,7 @@ describe("KeyValueView", () => {
     it("should properly iterate over subsets", () => {
         const src = { "1": 1, "2": 2 }
         const view = newKeyValueView(src)
-        const iter = view.newSubsetIterator()
+        const iter = view.newShadowIterator()
 
         const next = iter.next()
         expect(next.done).toBe(false)

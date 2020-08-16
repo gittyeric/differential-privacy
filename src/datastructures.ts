@@ -41,7 +41,7 @@ export interface SequenceView<KEY, VAL> {
      *
      * @memberof SequenceView
      */
-    newSubsetIterator: () => Iterator<SequenceView<KEY, VAL> | undefined>,
+    newShadowIterator: () => Iterator<SequenceView<KEY, VAL> | undefined>,
 }
 
 export interface ArrayView<EL> extends SequenceView<number, EL> { }
@@ -70,7 +70,7 @@ export function newArrayView<EL>(srcArray: EL[]): ArrayView<EL> {
             return srcArray
                 .map((el, index) => callback(el, index))
         },
-        newSubsetIterator: () => newArrayViewSubsetIterator(lazyArray),
+        newShadowIterator: () => newArrayViewSubsetIterator(lazyArray),
     }
     return lazyArray
 }
@@ -101,7 +101,7 @@ export function newKeyValueView<VAL>(srcKeyVals: { [key: string]: VAL }): KeyVal
             }
             return mapped
         },
-        newSubsetIterator: () => newKeyValueViewSubsetIterator(lazyKeyValues),
+        newShadowIterator: () => newKeyValueViewSubsetIterator(lazyKeyValues),
     }
     return lazyKeyValues
 }
@@ -129,7 +129,7 @@ function newIgnoreIndexArrayView<EL>(srcArray: ArrayView<EL>, ignoreIndex: numbe
             })
             return mapped
         },
-        newSubsetIterator: () => newArrayViewSubsetIterator(lazyArray),
+        newShadowIterator: () => newArrayViewSubsetIterator(lazyArray),
     }
     return lazyArray
 }
@@ -154,7 +154,7 @@ function newIgnoreKeyKeyValueView<VAL>(srcKV: KeyValueView<VAL>, ignoreKey: stri
             })
             return mapped
         },
-        newSubsetIterator: () => newKeyValueViewSubsetIterator(lazyKeyValues),
+        newShadowIterator: () => newKeyValueViewSubsetIterator(lazyKeyValues),
     }
     return lazyKeyValues
 }

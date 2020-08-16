@@ -12,7 +12,7 @@ describe("privatize", () => {
     it("should work with minimimal options", async () => {
         const options = {
             maxEpsilon: Number.MAX_SAFE_INTEGER, // allow ~Infinite data leakage
-            newSubsetIterator: dataset1To5.newSubsetIterator,
+            newShadowIterator: dataset1To5.newShadowIterator,
         }
         const privateFunc = privatize(avgFunction, options)
         // Avg should be 3
@@ -32,7 +32,7 @@ describe("privatize", () => {
         const options = {
             debugDangerously: true as true,
             maxEpsilon: Number.MAX_SAFE_INTEGER, // allow ~Infinite data leakage
-            newSubsetIterator: datasetIdMap1To5.newSubsetIterator,
+            newShadowIterator: datasetIdMap1To5.newShadowIterator,
             maxCallCount: 2,
         }
         const privateFunc = privatize(avgFunction, options)
@@ -59,7 +59,7 @@ describe("privatize", () => {
         const lotsaRandoms = random0to1Distribution(5000)
         const options = {
             maxEpsilon: 1,
-            newSubsetIterator: lotsaRandoms.newSubsetIterator,
+            newShadowIterator: lotsaRandoms.newShadowIterator,
             debugDangerously: true as true,
         }
         const privateFunc = privatize(avgFunction, options)
@@ -80,7 +80,7 @@ describe("privatize", () => {
         const options = {
             maxEpsilon: 0.0000001,
             maxCallCount: 99999999,
-            newSubsetIterator: lotsaRandoms.newSubsetIterator,
+            newShadowIterator: lotsaRandoms.newShadowIterator,
             debugDangerously: true as true,
         }
         const privateFunc = privatize(avgFunction, options)
@@ -95,7 +95,7 @@ describe("privatize", () => {
     it("should work on asyncronous sensitive functions", async () => {
         const options = {
             maxEpsilon: Number.MAX_SAFE_INTEGER,
-            newSubsetIterator: dataset1To5.newSubsetIterator,
+            newShadowIterator: dataset1To5.newShadowIterator,
         }
         const asyncAvg = (d: ArrayView<number>) => {
             return newPromiseLasting(1).then(() => avgFunction(d))
@@ -107,12 +107,12 @@ describe("privatize", () => {
     })
     it("should work as fast as possible on asyncronous subset iterators", async () => {
         const singleIterDelayMs = 5
-        const rawIter = dataset1To5.newSubsetIterator()
+        const rawIter = dataset1To5.newShadowIterator()
         const asyncIter = wrapIteratorInAsyncDelay(singleIterDelayMs, rawIter)
         const options: PrivatizeOptions<ArrayView<number>> = {
             maxEpsilon: Number.MAX_SAFE_INTEGER,
-            newSubsetIterator: () => asyncIter,
-            maxConcurrentFunctionCalls: 5,
+            newShadowIterator: () => asyncIter,
+            maxConcurrentCalls: 5,
         }
         
         const privateFunc = privatize(avgFunction, options)
@@ -127,12 +127,12 @@ describe("privatize", () => {
     })
     it("should work as slow as required on asyncronous subset iterators", async () => {
         const singleIterDelayMs = 5
-        const rawIter = dataset1To5.newSubsetIterator()
+        const rawIter = dataset1To5.newShadowIterator()
         const asyncIter = wrapIteratorInAsyncDelay(singleIterDelayMs, rawIter)
         const options: PrivatizeOptions<ArrayView<number>> = {
             maxEpsilon: Number.MAX_SAFE_INTEGER,
-            newSubsetIterator: () => asyncIter,
-            maxConcurrentFunctionCalls: 1,
+            newShadowIterator: () => asyncIter,
+            maxConcurrentCalls: 1,
         }
         
         const privateFunc = privatize(avgFunction, options)
@@ -150,7 +150,7 @@ describe("privatize", () => {
 
     it("should not accept options without required fields", () => {
         const missingEpsilon = {
-            newSubsetIterator: dataset1To5.newSubsetIterator,
+            newShadowIterator: dataset1To5.newShadowIterator,
         }
         expect(() => 
             privatize(avgFunction, missingEpsilon as any))
@@ -166,7 +166,7 @@ describe("privatize", () => {
     it("should not accept optional fields with invalid values", () => {
         const required = {
             maxEpsilon: 1,
-            newSubsetIterator: dataset1To5.newSubsetIterator,
+            newShadowIterator: dataset1To5.newShadowIterator,
         }
         
         const badMaxCalls = {
@@ -179,7 +179,7 @@ describe("privatize", () => {
         
         const badMaxConcurrentCalls = {
             ...required,
-            maxConcurrentFunctionCalls: -1
+            maxConcurrentCalls: -1
         }
         expect(() =>
             privatize(avgFunction, badMaxConcurrentCalls as any))

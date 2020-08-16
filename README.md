@@ -1,56 +1,102 @@
-# WIP! DO NOT USE!  Wait a week or so :-)
-
 # Differential Privacy
 
-This library implements Global Differential Privacy that allows you to protect the privacy of any users (or entities) in some data set while still running any aggregations over their private data.  Differential attacks are ways to steal data from APIs and derive information about individual users through only aggregate information.  Differential privacy helps to prevent this while also enabling TRUE anonymization for sensitive user data.
+This library implements the Laplace mechanism for Global Differential Privacy that allows you to protect the privacy of any users (or entities) in some data set while still allowing aggregations over their private data.  Differential attacks are ways to steal data from APIs and derive information about individual users through only aggregate information.  Differential privacy helps to prevent this while also providing an anonymization scheme with mathematical guarantees.
 
-## Features
+
+# Features
 
 - Works for any JS or TS function that operates on a countable datastructure and returns a number!
-- Includes batteries, specify how much information you want to give away in terms of the probability of learning a row value for some specific user in the data set
-- Split up a finite privacy budget for a 3rd party into an arbitrary number of max lifetime queries automatically
+- Built-in Dataset implementations for arrays and associative arrays
+- Plugs for custom Datasets
+
+# Definitions
+
+**Identity**: A unique identity of someone/something whose values need to be private.
+
+**DATASET**: Any set of data containing more than 1 Identity whose individual values need to be private.  The DATASET can be any structure which can be efficiently iterated over using the newShadowIterator function.
+
+**Shadow DATASET**: A copy of a DATASET with some 1 unique Identity removed.
+
+**Shadow Iterator**: An iterator on a DATASET that returns every possible "Shadow DATASET", each having a unique Identity removed.
+
+**SensitiveFunction**: Any sensitive function whose numeric return value needs to be protected with noise so individual element values in DATASET cannot be fully determined.
+
+**PrivatizedFunction**: A privatized sensitive function whose return value has sufficient noise added to become "epsilon differentially private".
+
+**Epsilon**: A measure of how much information about an Identity you're willing to leak to query consumers.  This definition comes straight out of the definition of (Epsilon-Differential Privacy)[https://en.wikipedia.org/wiki/Differential_privacy#Definition_of_%CE%B5-differential_privacy].
 
 ## Usage
 
-`privatize(aggFunction: (dataset: any) => number | Promise<number>, options: PrivatizeOptions)`
+`privatize(sensitiveFunction: (dataset: any) => number | Promise<number>, options: PrivatizeOptions)`
 
-sensitiveFunction: Any function that operates on some dataset and returns either a resulting number or a Promise containing a number.
+**sensitiveFunction**: Any function that operates on some dataset and returns either a resulting number or a Promise for a number.
 
-options: 
+**options**: 
 
 ```
 {
-    maxCertaintyOfMemberValue: number. (Required) A number between 0 and 1 that indicates the probability of a differential query attack could reveal the value of some member of the dataset.  A probability of 1 means the attacker will get perfect accurracy every query and unlimited query attempts.  Probability near zero would give highly randomized results to the attacker even with only few query attempts.
+    maxEpsilon: number. (Required) A number > 0 that indicates the maximum amount of data you're willing to leak (according to the difinition of Epsilon-Differential Privacy).  The actual epsilon
+    used per privatizedFunction run is maxEpsilon/maxCallCount.
 
+    newShadowIterator: (datastore: DATASET) => Iterator<DATASET> | Iterator<Promise<DATASET>>. (Required) A function that takes an unaltered DATASET and returns an Iterator<DATASET> that iterates over every possible subset of DATASET such that each subset has all elements related to a unique identity removed.  For example, an Array might splice out a different index upon every iteration if each index represents a user.  See the "Generic SubsetIterators" section for implementations on common datastructures.
 
-    newSubsetIterator: (datastore: DATASET) => Iterator<DATASET> | Iterator<Promise<DATASET>>. (Required) A function that takes an unaltered DATASET and returns an Iterator<DATASET> that iterates over every possible subset of DATASET such that each subset has all elements related to a unique identity removed.  For example, an Array might splice out a different index upon every iteration if each index represents a user.  See the "Generic SubsetIterators" section for implementations on common datastructures.
+    maxCalls?: number. (Optional) The maximum number of calls a privaitzedFunction instance can make before throwing a PrivacyBudgetExceededError.
 
+    maxConcurrentCalls?: number (Optional) The maximum number of sensitiveFunction calls that will be executed simultaneously.  Defaults to 4 to avoid accidently exhausting databases or similar downstream resources.  If there is no potential to bottleneck downstream resources, it's safe to set this to Number.MAX_NUMBER for the best performance.
 
-    datasetIsImmutable?: boolean. (Optional) If the instance of DATASET will never change and your sensitiveFunction does not produce side-effects (mutation), set this to true to get huge performance benefits.  When true, the running time of the privatized function versus the raw sensitiveFunction is nearly identical after the first privatized function invokation.  Defaults to false.
-
-
-    maxConcurrentFunctionCalls?: number (Optional) The maximum number of sensitiveFunction calls that will be executed simultaneously.  Defaults to 4 to avoid accidently beating up databases or similar downstream resources.  If there is no potential to bottleneck downstream resources, it's safe to set this to Number.MAX_NUMBER for max performance.
-
+    debugDangerously?: boolean (Optional) If enabled, adds the "privateResult" and "noiseAdded" fields to the PrivatizedFunction result.  These fields should ONLY be used to find a good maxEpsilon for your consumers.
 
 }
 ```
 
 ## Example Usage
 
-See /examples for built-in primitive wrappers for primitives and custom DATASET implementations like SQL.
+### Make individual array values private for an Averaging function
 
-### Wrap your naked database! Protect the age of all your users while getting the average age
+```
 
-Without modification to your current raw database, this library could layer on top, just before actually running the query, and rigorously fuzz the resulting average age just enough to not reveal the actual ages of anyone in the actual dataset beyond some low certainty threshold:
+import { newArrayView, privatize } from "differential-privacy";
+
+// DATASET definitions
+const array1To5 = [1, 2, 3, 4, 5];
+// Wrap array in efficient ArrayView to get a fast shadow iterator
+const dataset1To5 = newArrayView(array1To5);
+
+// Sensitive Function definition
+const avgFunction = (elements) => {
+    let [sum, count] = [0, 0];
+    elements.forEach((e) => { sum += e; count++; });
+    return sum / count;
+}
+
+const privateFunc = privatize(avgFunction, {
+    maxEpsilon: 1,
+    newShadowIterator: dataset1To5.newShadowIterator,
+});
+const privatizedResult = await privateFunc(dataset1To5);
+
+// Avg should be 3 but with noise added to hide individual values
+console.log(privatizedResult.result);
+```
+
+See the built-in `newArrayView` and `newKeyValueView` functions for efficient native array/associative array DATASET implementations generally.
+
+### SQL: Get average age while protecting individual birthdays
+
+See [examples/custom-mysql.ts](examples/custom-mysql.ts)
+
+## Performance Considerations
+
+If the Big-O runtime of your sensitiveFunction is X and you have a constant time Shadow Iterator for your DATASET, you can expect the privatizedFunction to run in O(|DATASET| * X).
 
 ## Performance Tips
 
-- Set maxConcurrentFunctionCalls in options to a high number if upstream bottlenecks are not an issue for your use-case.
-- Ensure your newSubsetIterator implementation does not literally create new copies of the original DATASET on each iteration.  Instead, since you have a lot of freedom in the type of DATASET, you can define it as a function and wrap middleware inbetween to artifically create a cloned DATASET without the cost of a new copy.  See /examples for efficient examples that iterate over subsets without making copies.
+- Set maxConcurrentCalls in options to a high number if downstream bottlenecks are not an issue for your use-case.
+- Ensure your newShadowIterator implementation does not literally create new copies of the original DATASET on each iteration.  Instead, since you have a lot of freedom in the type of DATASET, you can define it as a function and wrap middleware inbetween to artifically create a cloned DATASET without the cost of a new copy.  See /examples for efficient examples that iterate over subsets without making copies.
 
-## Accuracy Tips
+## Balancing Privacy vs. Accuracy
 
-It's highly recommended to go for a straightforward implementation, then review the number of privatized function calls you can perform before receiving a PrivacyBudgetExceededError.
+Finding a good maxEpsilon is currently not the easiest task.  You can turn on the debugDangerously flag in options to help determine a good tradeoff between a high epsilon for user privacy vs a low epsilon for lots of accurate queries.  Better tooling for finding good maxEpsilons is planned in the future.
 
 ## Feature Wish List
 

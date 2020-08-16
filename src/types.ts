@@ -1,6 +1,6 @@
 export interface PrivatizeOptions<DATASET> {
     maxEpsilon: number,
-    newSubsetIterator: NewDatasetSubsetIterator<DATASET>,
+    newShadowIterator: NewDatasetSubsetIterator<DATASET>,
     /**
      * The max number of privatized function invokations before maxEpsilon information is leaked.
      * Calling the privated function after maxCallCount invokations will throw a PrivacyBudgetExceededError.
@@ -19,7 +19,7 @@ export interface PrivatizeOptions<DATASET> {
      * @type {number}
      * @memberof PrivatizeOptions
      */
-    maxConcurrentFunctionCalls?: number,
+    maxConcurrentCalls?: number,
 
     /**
      * Enables the "privateResult" and "noiseAdded" fields to all subsequent 

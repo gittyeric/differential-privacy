@@ -30,8 +30,8 @@ export function privatizeFactory
             }
             const sensitivity =
                 await calculateSensitivity(sensitiveFunction,
-                    options.newSubsetIterator, dataset, 
-                    options.maxConcurrentFunctionCalls)
+                    options.newShadowIterator, dataset, 
+                    options.maxConcurrentCalls)
 
             // Call and unwrap sensitiveFunction
             const rawResult = sensitiveFunction(dataset)
@@ -74,11 +74,11 @@ type FilledOptions
 function fillDefaultOptions<D, USEROPTS extends PrivatizeOptions<D>>(options: USEROPTS): FilledOptions<D, USEROPTS, TypedOptions<D, USEROPTS>> {
     const filled = {
         maxEpsilon: options.maxEpsilon,
-        newSubsetIterator: options.newSubsetIterator,
+        newShadowIterator: options.newShadowIterator,
         maxCallCount: isNumber(options.maxCallCount) ? options.maxCallCount : 1,
-        maxConcurrentFunctionCalls: 
-            isNumber(options.maxConcurrentFunctionCalls) ? 
-                options.maxConcurrentFunctionCalls : 4,
+        maxConcurrentCalls: 
+            isNumber(options.maxConcurrentCalls) ? 
+                options.maxConcurrentCalls : 4,
         debugDangerously: options.debugDangerously === true,
     } as FilledOptions<D, USEROPTS, TypedOptions<D, USEROPTS>>
     if (options.debugDangerously === true) {
@@ -99,25 +99,25 @@ function validateOptions<D, USEROPTS extends PrivatizeOptions<D>>(
     if (!isNumber(options.maxEpsilon) || options.maxEpsilon <= 0) {
         throw new Error("maxEpsilon must be a number > 0")
     }
-    if (!isFunction(options.newSubsetIterator)) {
-        throw new Error("Must provide a newSubsetIterator function, please see docs")
+    if (!isFunction(options.newShadowIterator)) {
+        throw new Error("Must provide a newShadowIterator function, please see docs")
     }
     if (options.maxCallCount !== undefined) {
         if (!isNumber(options.maxCallCount) || options.maxCallCount < 1) {
             throw new Error("Please get a valid integer >= 1 for maxCallCount")
         }
     }
-    if (options.maxConcurrentFunctionCalls !== undefined) {
-        if (!isNumber(options.maxConcurrentFunctionCalls) || options.maxConcurrentFunctionCalls < 1) {
-            throw new Error("Please give a valid integer >= 1 for maxConcurrentFunctionCalls")
+    if (options.maxConcurrentCalls !== undefined) {
+        if (!isNumber(options.maxConcurrentCalls) || options.maxConcurrentCalls < 1) {
+            throw new Error("Please give a valid integer >= 1 for maxConcurrentCalls")
         }
     }
 
     const parsed = {
         maxEpsilon: options.maxEpsilon as number,
-        newSubsetIterator: options.newSubsetIterator as NewDatasetSubsetIterator<D>,
+        newShadowIterator: options.newShadowIterator as NewDatasetSubsetIterator<D>,
         maxCallCount: options.maxCallCount,
-        maxConcurrentFunctionCalls: options.maxConcurrentFunctionCalls,
+        maxConcurrentCalls: options.maxConcurrentCalls,
         debugDangerously: (options.debugDangerously === true ? true : undefined),
     } as TypedOptions<D, USEROPTS>
 

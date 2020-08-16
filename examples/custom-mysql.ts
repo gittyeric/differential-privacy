@@ -40,8 +40,8 @@ async function customDatasetExample() {
         maxCallCount: 100,
         // Let's not stress out the database too much,
         // max of 4 concurrent queries per privatizedAvg call
-        maxConcurrentFunctionCalls: 4,
-        newSubsetIterator: newSqlLikeSubsetIterator(),
+        maxConcurrentCalls: 4,
+        newShadowIterator: newSqlLikeSubsetIterator(),
     })
 
     // Run empty where clause to get the overall average age for all users,
@@ -50,4 +50,7 @@ async function customDatasetExample() {
 
     // The final, privatized averge age as a number
     const noisedAvgAge = noisedResult.result
+    console.log(noisedAvgAge)
 }
+
+customDatasetExample()

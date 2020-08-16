@@ -22,7 +22,7 @@ async function simpleArrayExample(): Promise<number> {
         * will be thrown, preventing excess data leakage.
         */
         maxCallCount: 10, 
-        newSubsetIterator: toHideAsView.newSubsetIterator,
+        newShadowIterator: toHideAsView.newShadowIterator,
     })
 
     const privateResult = await privateAvg(toHideAsView)
@@ -53,7 +53,7 @@ async function simpleAssociativeArrayExample(): Promise<number> {
         * will be thrown, preventing excess data leakage.
         */
         maxCallCount: 10, 
-        newSubsetIterator: toHideAsView.newSubsetIterator,
+        newShadowIterator: toHideAsView.newShadowIterator,
     })
 
     const privateResult = await privateAvg(toHideAsView)
