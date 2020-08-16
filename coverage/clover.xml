@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1597603453367" clover="3.2.0">
-  <project timestamp="1597603453368" name="All files">
+<coverage generated="1597608889230" clover="3.2.0">
+  <project timestamp="1597608889230" name="All files">
     <metrics statements="151" coveredstatements="151" conditionals="68" coveredconditionals="68" methods="43" coveredmethods="43" elements="262" coveredelements="262" complexity="0" loc="151" ncloc="151" packages="1" files="6" classes="6"/>
     <file name="datastructures.ts" path="/home/burt/Documents/differential-privacy/src/datastructures.ts">
       <metrics statements="63" coveredstatements="63" conditionals="18" coveredconditionals="18" methods="32" coveredmethods="32"/>
