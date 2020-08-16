@@ -19,4 +19,3 @@ export const privatize:
 
 export * from "./datastructures";
 export * from "./types";
-export default privatize

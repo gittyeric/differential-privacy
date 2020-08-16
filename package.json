@@ -1,6 +1,6 @@
 {
   "name": "differential-privacy",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Implements Global Differential Privacy for almost any numeric function",
   "keywords": [
     "epsilon",
