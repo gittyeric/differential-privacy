@@ -71,7 +71,8 @@ This NPM library implements the secure Laplace mechanism for Global Differential
 
 ```
 
-import { newArrayView, privatize } from "differential-privacy";
+const differentialPrivacy = require("differential-privacy");
+const { newArrayView, privatize } = differentialPrivacy;
 
 // DATASET definitions
 const array1To5 = [1, 2, 3, 4, 5];

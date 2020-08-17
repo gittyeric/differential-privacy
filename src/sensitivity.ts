@@ -30,7 +30,7 @@ export async function calculateSensitivity<DATASET>
     let maxOutput = new Decimal(Number.NEGATIVE_INFINITY)
     const pendingCalculations: Promise<any>[] = []
     for (let curIter = datasetIter.next();
-        curIter !== undefined;
+        true;
         curIter = datasetIter.next()) {
 
         const curValue = curIter.value
