@@ -1,6 +1,6 @@
 import { isFunction, isNumber } from 'util';
 import { calculateSensitivity } from './sensitivity';
-import { PrivacyBudgetExceededError, PrivatizedResult, PrivatizedFunction, PrivatizeOptions, Privatizer, PrivatizedFunctionResult, SensitiveFunction, NewDatasetSubsetIterator } from './types';
+import { PrivacyBudgetExceededError, PrivatizedResult, PrivatizedFunction, PrivatizeOptions, Privatizer, PrivatizedFunctionResult, SensitiveFunction, NewShadowDatasetIterator } from './types';
 import Decimal from 'decimal.js';
 
 export type ProbabilityDistribution =
@@ -115,7 +115,7 @@ function validateOptions<D, USEROPTS extends PrivatizeOptions<D>>(
 
     const parsed = {
         maxEpsilon: options.maxEpsilon as number,
-        newShadowIterator: options.newShadowIterator as NewDatasetSubsetIterator<D>,
+        newShadowIterator: options.newShadowIterator as NewShadowDatasetIterator<D>,
         maxCallCount: options.maxCallCount,
         maxConcurrentCalls: options.maxConcurrentCalls,
         debugDangerously: (options.debugDangerously === true ? true : undefined),

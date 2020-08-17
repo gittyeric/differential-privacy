@@ -1,4 +1,4 @@
-import { NewDatasetSubsetIterator, privatize } from "../src";
+import { NewShadowDatasetIterator, privatize } from "../src";
 
 // A mock SQL query function, replace this with your own
 let sqlQuery: (query: string) => Promise<number> =
@@ -9,10 +9,10 @@ function sqlAvg(whereFilter: string): Promise<number> {
 }
 
 // Bare down for the hard part!
-// Runs a query over every "subset" of the SQL database where
-// each subset removes 1 unique entry. This simple iterator assumes the
+// Runs a query over every shadow "subset" of the SQL database where
+// each subset removes 1 unique Identity. This simple iterator assumes the
 // Users SQL table does not change over time.
-function newSqlLikeSubsetIterator(): NewDatasetSubsetIterator<string> {
+function newSqlLikeShadowIterator(): NewShadowDatasetIterator<string> {
     const pendingUserCount = sqlQuery("SELECT COUNT(*) FROM Users")
     let i = 0
     return async () => {
@@ -41,7 +41,7 @@ async function customDatasetExample() {
         // Let's not stress out the database too much,
         // max of 4 concurrent queries per privatizedAvg call
         maxConcurrentCalls: 4,
-        newShadowIterator: newSqlLikeSubsetIterator(),
+        newShadowIterator: newSqlLikeShadowIterator(),
     })
 
     // Run empty where clause to get the overall average age for all users,

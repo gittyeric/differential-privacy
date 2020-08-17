@@ -1,4 +1,4 @@
-import { SensitiveFunction, NewDatasetSubsetIterator } from './types';
+import { SensitiveFunction, NewShadowDatasetIterator } from './types';
 import Decimal from 'decimal.js';
 
 /**
@@ -8,7 +8,7 @@ import Decimal from 'decimal.js';
  * @export
  * @template DATASET
  * @param {SensitiveFunction<DATASET>} func
- * @param {NewDatasetSubsetIterator<DATASET>} newSubsetIter
+ * @param {NewShadowDatasetIterator<DATASET>} newSubsetIter
  * @param {DATASET} dataset
  * @param {number} maxConcurrencyCount
  * @returns {Promise<Decimal>}
@@ -16,7 +16,7 @@ import Decimal from 'decimal.js';
 export async function calculateSensitivity<DATASET>
     (
         func: SensitiveFunction<DATASET>,
-        newSubsetIter: NewDatasetSubsetIterator<DATASET>,
+        newSubsetIter: NewShadowDatasetIterator<DATASET>,
         dataset: DATASET,
         maxConcurrencyCount: number,
 ): Promise<Decimal> {

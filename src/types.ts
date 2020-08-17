@@ -1,6 +1,6 @@
 export interface PrivatizeOptions<DATASET> {
     maxEpsilon: number,
-    newShadowIterator: NewDatasetSubsetIterator<DATASET>,
+    newShadowIterator: NewShadowDatasetIterator<DATASET>,
     /**
      * The max number of privatized function invokations before maxEpsilon information is leaked.
      * Calling the privated function after maxCallCount invokations will throw a PrivacyBudgetExceededError.
@@ -41,13 +41,13 @@ export type SubsetIterator<DATASET> =
     Promise<Iterator<Promise<DATASET | undefined>>>
 /**
  * Returns an iterator that gives every possible subset of DATASET where
- * each subset has a unique Identity removed from the DATASET.
+ * each subset (shadow dataset) has a unique Identity removed from the DATASET.
  * Removing each Identity must remove at least 1 unique element from the original DATASET
  * Performance tip: DO NOT actually clone the original dataset each time and remove an identity,
  * but ideally pass a thin wrapper that excludes the identity from the original reference.
  * See README.md's performance section for examples.
  */
-export type NewDatasetSubsetIterator<DATASET> =
+export type NewShadowDatasetIterator<DATASET> =
     (originalDataset: DATASET) =>
         SubsetIterator<DATASET>
 
