@@ -1,6 +1,6 @@
 import { isFunction, isNumber } from 'util';
 import { calculateSensitivity } from './sensitivity';
-import { PrivacyBudgetExceededError, PrivateResult, PrivatizedFunction, PrivatizeOptions, Privatizer, PrivateFunctionResult, SensitiveFunction, NewDatasetSubsetIterator } from './types';
+import { PrivacyBudgetExceededError, PrivatizedResult, PrivatizedFunction, PrivatizeOptions, Privatizer, PrivatizedFunctionResult, SensitiveFunction, NewDatasetSubsetIterator } from './types';
 import Decimal from 'decimal.js';
 
 export type ProbabilityDistribution =
@@ -13,7 +13,7 @@ export function privatizeFactory
     return function(
         sensitiveFunction: SensitiveFunction<DATASET>,
         userOptions: OPTIONS): 
-        PrivatizedFunction<DATASET, PrivateFunctionResult<OPTIONS>> {
+        PrivatizedFunction<DATASET, PrivatizedFunctionResult<OPTIONS>> {
         const validatedOptions = validateOptions(userOptions)
         const options = fillDefaultOptions(validatedOptions)
 
@@ -44,7 +44,7 @@ export function privatizeFactory
             const noise = probDistFunc(sensitivity, epsilon)
             const noisyResult = sensitiveResult.plus(noise)
 
-            const result: PrivateResult = {
+            const result: PrivatizedResult = {
                 epsilonBudgetUsed: epsilonAsNumber,
                 percentBudgetUsed: 1.0 / options.maxCallCount,
                 result: noisyResult.toNumber(),
@@ -56,7 +56,7 @@ export function privatizeFactory
                 noiseAdded: noise.toNumber(),
                 privateResult: sensitiveResult.toNumber(),
                 result: result.result,
-            } : result) as PrivateFunctionResult<OPTIONS>
+            } : result) as PrivatizedFunctionResult<OPTIONS>
         }
     }
 }

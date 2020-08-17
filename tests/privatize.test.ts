@@ -25,7 +25,7 @@ describe("privatize", () => {
         expect(result.result).toBeGreaterThan(2.9999999999)
         expect(result.result).toBeLessThan(3.00000000001)
 
-        // Should fail on 2nd call since maxCalls defaults to 1
+        // Should fail on 2nd call since maxCallCount defaults to 1
         expect(privateFunc(dataset1To5)).rejects.toThrowError()
     })
     it("should work with all options", async () => {
@@ -169,12 +169,12 @@ describe("privatize", () => {
             newShadowIterator: dataset1To5.newShadowIterator,
         }
         
-        const badMaxCalls = {
+        const badmaxCallCount = {
             ...required,
             maxCallCount: "5",
         }
         expect(() => 
-            privatize(avgFunction, badMaxCalls as any))
+            privatize(avgFunction, badmaxCallCount as any))
             .toThrow()
         
         const badMaxConcurrentCalls = {

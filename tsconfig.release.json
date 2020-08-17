@@ -3,5 +3,8 @@
   "compilerOptions": {
     "declaration": true,
     "allowJs": false,
-  }
+  },
+  "include": [
+    "src/**/*"
+  ]
 }

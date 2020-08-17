@@ -23,7 +23,7 @@ export interface PrivatizeOptions<DATASET> {
 
     /**
      * Enables the "privateResult" and "noiseAdded" fields to all subsequent 
-     * PrivateFunctionResults.  These fields should ONLY be used for debugging
+     * PrivatizedFunctionResults.  These fields should ONLY be used for debugging
      * and finding good epsilon bounds for your use-case.
      *
      * @type {boolean}
@@ -55,15 +55,15 @@ export type NewDatasetSubsetIterator<DATASET> =
  * The result returned from a sensitive function that's been protected with privatize()
  *
  * @export
- * @interface PrivateResult
+ * @interface PrivatizedResult
  */
-export interface PrivateResult {
+export interface PrivatizedResult {
     /**
      * The inner result of the private function but with noise added.
      * This is the ONLY information that's safe to give back to unstrusted consumers!
      *
      * @type {number}
-     * @memberof PrivateFunctionResult
+     * @memberof PrivatizedFunctionResult
      */
     result: number,
 
@@ -72,7 +72,7 @@ export interface PrivateResult {
      * Do not leak this information to untrusted consumers.
      *
      * @type {number}
-     * @memberof PrivateFunctionResult
+     * @memberof PrivatizedFunctionResult
      */
     epsilonBudgetUsed: number,
 
@@ -81,27 +81,27 @@ export interface PrivateResult {
      * Do not leak this information to untrusted consumers.
      *
      * @type {number}
-     * @memberof PrivateFunctionResult
+     * @memberof PrivatizedFunctionResult
      */
     percentBudgetUsed: number,
 
 }
 
 /**
- * Same as PrivateFunctionResult but adds dangerous fields that definately
+ * Same as PrivatizedFunctionResult but adds dangerous fields that definately
  * should not be shared.
  *
  * @export
- * @interface DangerousPrivateFunctionResult
+ * @interface DangerousPrivatizedFunctionResult
  */
-export interface DangerousResult extends PrivateResult {
+export interface DangerousResult extends PrivatizedResult {
     /**
      * The private, true result of the sensitive function. This obviously
      * should not be shared and is not even set unless the debugDangerously 
      * option is true
      *
      * @type {number}
-     * @memberof PrivateFunctionResult
+     * @memberof PrivatizedFunctionResult
      */
     privateResult: number,
 
@@ -112,7 +112,7 @@ export interface DangerousResult extends PrivateResult {
      * the debugDangerously option is true
      *
      * @type {number}
-     * @memberof PrivateFunctionResult
+     * @memberof PrivatizedFunctionResult
      */
     noiseAdded: number,
 }
@@ -121,13 +121,13 @@ export interface DangerousOptions {
     debugDangerously: true,
 }
 
-// Resolve the exact PrivateResult based on OPTIONS subtype
-export type PrivateFunctionResult<OPTIONS extends PrivatizeOptions<any>> =
+// Resolve the exact PrivatizedResult based on OPTIONS subtype
+export type PrivatizedFunctionResult<OPTIONS extends PrivatizeOptions<any>> =
     OPTIONS extends DangerousOptions ?
     DangerousResult :
-    PrivateResult
+    PrivatizedResult
 
-export type PrivatizedFunction<DATASET, PFR extends PrivateResult> =
+export type PrivatizedFunction<DATASET, PFR extends PrivatizedResult> =
     (datastore: DATASET) => Promise<PFR>
 
 export type Privatizer<DATASET, OPTIONS extends PrivatizeOptions<DATASET>> = (
@@ -135,7 +135,7 @@ export type Privatizer<DATASET, OPTIONS extends PrivatizeOptions<DATASET>> = (
     options: OPTIONS,
 ) => PrivatizedFunction<
     DATASET,
-    PrivateFunctionResult<OPTIONS>
+    PrivatizedFunctionResult<OPTIONS>
 >
 
 export type SensitiveSyncFunction<D> = (dataset: D) => number

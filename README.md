@@ -1,7 +1,6 @@
 # Differential Privacy
 
-This library implements the Laplace mechanism for Global Differential Privacy that allows you to protect the privacy of any users (or entities) in some data set while still allowing aggregations over their private data.  Differential attacks are ways to steal data from APIs and derive information about individual users through only aggregate information.  Differential privacy helps to prevent this while also providing an anonymization scheme with mathematical guarantees.
-
+This NPM library implements the secure Laplace mechanism for Global Differential Privacy that allows you to protect the privacy of any users (or entities) in some data set while still allowing untrusted aggregations over their private data.  Differential attacks are ways to steal data from APIs and derive information about individual users through only aggregate information.  Differential privacy helps to prevent this while also providing an anonymization scheme with mathematical guarantees.
 
 # Features
 
@@ -23,9 +22,9 @@ This library implements the Laplace mechanism for Global Differential Privacy th
 
 **PrivatizedFunction**: A privatized sensitive function whose return value has sufficient noise added to become "epsilon differentially private".
 
-**Epsilon**: A measure of how much information about an Identity you're willing to leak to query consumers.  This definition comes straight out of the definition of (Epsilon-Differential Privacy)[https://en.wikipedia.org/wiki/Differential_privacy#Definition_of_%CE%B5-differential_privacy].
+**Epsilon**: A measure of how much information about an Identity you're willing to leak to query consumers.  This definition comes straight out of the definition of ["Epsilon-Differential Privacy"]("https://en.wikipedia.org/wiki/Differential_privacy#Definition_of_%CE%B5-differential_privacy").
 
-## Usage
+# API
 
 `privatize(sensitiveFunction: (dataset: any) => number | Promise<number>, options: PrivatizeOptions)`
 
@@ -40,7 +39,7 @@ This library implements the Laplace mechanism for Global Differential Privacy th
 
     newShadowIterator: (datastore: DATASET) => Iterator<DATASET> | Iterator<Promise<DATASET>>. (Required) A function that takes an unaltered DATASET and returns an Iterator<DATASET> that iterates over every possible subset of DATASET such that each subset has all elements related to a unique identity removed.  For example, an Array might splice out a different index upon every iteration if each index represents a user.  See the "Generic SubsetIterators" section for implementations on common datastructures.
 
-    maxCalls?: number. (Optional) The maximum number of calls a privaitzedFunction instance can make before throwing a PrivacyBudgetExceededError.
+    maxCallCount?: number. (Optional) The maximum number of calls a privaitzedFunction instance can make before throwing a PrivacyBudgetExceededError.
 
     maxConcurrentCalls?: number (Optional) The maximum number of sensitiveFunction calls that will be executed simultaneously.  Defaults to 4 to avoid accidently exhausting databases or similar downstream resources.  If there is no potential to bottleneck downstream resources, it's safe to set this to Number.MAX_NUMBER for the best performance.
 
@@ -48,10 +47,27 @@ This library implements the Laplace mechanism for Global Differential Privacy th
 
 }
 ```
+**Returns**: _(dataset) => PrivatizedResult_. A PrivatizedFunction that when called with a DATASET returns a PrivatizedResult:
 
-## Example Usage
+```
+{
+    result: number. The private result of the sensitive function with sufficient noise added to be safe for sharing.
 
-### Make individual array values private for an Averaging function
+    epsilonBudgetUsed: number. The epsilon used for this individual function call.
+
+    percentBudgetUsed: number. Same as epsilonBudgetUsed but expressed as a percentage from 0 to 1.
+
+    privateResult?: number. The private, true result of the sensitiveFunction. This obviously should not be shared and does not exist unless debugDangerously is true in PrivatizeOptions.
+
+    noiseAdded?: number. The amount of noise added to the "privateResult" to obtain the public "result". When combined with the "result", figuring out "privateResult" becomes trivial, so this should not be shared and is not even set unless the debugDangerously option is true.
+}
+```
+
+**throws** PrivacyBudgetExceededError if maxEpsilon privacy budget is used up or maxCallCount is exceeded per PrivatizedFunction instance.
+
+# Example Usage
+
+## Make individual array values private for an Averaging function
 
 ```
 
@@ -63,31 +79,46 @@ const array1To5 = [1, 2, 3, 4, 5];
 const dataset1To5 = newArrayView(array1To5);
 
 // Sensitive Function definition
-const avgFunction = (elements) => {
+const avgFunction = (view) => {
     let [sum, count] = [0, 0];
-    elements.forEach((e) => { sum += e; count++; });
+    view.forEach((el) => { sum += el; count++; });
     return sum / count;
 }
 
-const privateFunc = privatize(avgFunction, {
+const protectedAvg = privatize(avgFunction, {
     maxEpsilon: 1,
     newShadowIterator: dataset1To5.newShadowIterator,
 });
-const privatizedResult = await privateFunc(dataset1To5);
+const privatizedResult = await protectedAvg(dataset1To5);
 
-// Avg should be 3 but with noise added to hide individual values
+// Avgerage is 3 but with noise added to hide individual values.
+// Since DATASET.length is small and maxEpsilon is low, the noisy
+// result will likely be far from 3.0 but still centered around it.
 console.log(privatizedResult.result);
 ```
 
-See the built-in `newArrayView` and `newKeyValueView` functions for efficient native array/associative array DATASET implementations generally.
+See the built-in `newArrayView` and `newKeyValueView` functions for efficient native array and associative array DATASET implementations.
 
-### SQL: Get average age while protecting individual birthdays
+## SQL: Get average age while protecting individual birthdays
 
 See [examples/custom-mysql.ts](examples/custom-mysql.ts)
 
-## Performance Considerations
+# NPM Installation
 
-If the Big-O runtime of your sensitiveFunction is X and you have a constant time Shadow Iterator for your DATASET, you can expect the privatizedFunction to run in O(|DATASET| * X).
+```
+npm install differential-privacy
+```
+
+You can now import everything you need for the example above:
+```
+import {
+    privatize, newArrayView, newKeyValueView
+} from 'differential-privacy';
+```
+
+# Performance Considerations
+
+If the Big-O runtime of your sensitiveFunction is O(X) and you have a constant time Shadow Iterator for your DATASET, you can expect the privatizedFunction to run in O(|DATASET| * X).
 
 ## Performance Tips
 
@@ -98,16 +129,36 @@ If the Big-O runtime of your sensitiveFunction is X and you have a constant time
 
 Finding a good maxEpsilon is currently not the easiest task.  You can turn on the debugDangerously flag in options to help determine a good tradeoff between a high epsilon for user privacy vs a low epsilon for lots of accurate queries.  Better tooling for finding good maxEpsilons is planned in the future.
 
-## Security / decimal.js Note
+# Security / decimal.js Note
 
 This lib implements all real number operations using fixed-precision values from decimal.js.  This prevents known IEEE floating point attacks on the Laplace Mechanism.  If you're using decimal.js, beware that this library needs to mutate some decimal.js settings globally!  See src/index.ts for more.
 
-## Feature Wish List
+# Feature Wish List
 
 Hey! Come contribute with a Pull Request!  Here's some ideas:
 
 - Better tooling for finding good maxEpsilons per use-case
 - Support for Local Differential Privacy
-- More accurate measurement of epsilon used per query + dynamic maxCalls count
+- More accurate measurement of epsilon used per query + dynamic maxCallCount count
+- Add support for sensitiveFunctions that return number[] (or maybe just a `combine(privatized1, privatized2)` util?).
 - Support for more distribution functions other than Laplace
 - Some form of sampling to avoid O(|DATASET|) extra time complexity per call at the cost of epsilon accuracy
+
+# Installation for Development and Modification
+
+Make sure you have Git and Node.js version >= 10 installed with npm as well.
+Run the following command line:
+
+```
+git clone https://github.com/gittyeric/differential-privacy.git
+npm install
+npm run build
+```
+
+If you'd like to contribute, commit your work on a new branch and run the following:
+
+```
+npm run deploy-dry
+```
+
+If lint and tests pass, send a Pull Request in GitHub!

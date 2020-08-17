@@ -1,7 +1,7 @@
 import { Decimal } from 'decimal.js';
 import { laplaceProbDistribution } from './laplace';
 import { privatizeFactory } from './privatize';
-import { PrivateFunctionResult, PrivatizedFunction, PrivatizeOptions, SensitiveFunction } from './types';
+import { PrivatizedFunctionResult, PrivatizedFunction, PrivatizeOptions, SensitiveFunction } from './types';
 import crypto from "crypto"
 
 // Need to set precision high enough to avoid IEEE floating point
@@ -14,7 +14,7 @@ Decimal.set({ precision: 25, rounding: 4, crypto: true })
 
 export const privatize:
     <DATASET, OPTIONS extends PrivatizeOptions<DATASET>>(fnc: SensitiveFunction<DATASET>, options: OPTIONS)
-        => PrivatizedFunction<DATASET, PrivateFunctionResult<OPTIONS>> =
+        => PrivatizedFunction<DATASET, PrivatizedFunctionResult<OPTIONS>> =
     privatizeFactory(laplaceProbDistribution)
 
 export * from "./datastructures";

@@ -1,6 +1,6 @@
 {
   "name": "differential-privacy",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Implements Global Differential Privacy for almost any numeric function",
   "keywords": [
     "epsilon",
@@ -18,7 +18,7 @@
   "sideEffects": [
     "./lib/index.js"
   ],
-  "engineStrict": false,
+  "engineStrict": true,
   "engines": {
     "node": ">= 8.0.0"
   },
