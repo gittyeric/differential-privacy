@@ -1,5 +1,10 @@
 # Differential Privacy
 
+[![Coverage Status](https://coveralls.io/repos/github/gittyeric/differential-privacy/badge.svg?branch=master)](https://coveralls.io/github/gittyeric/differential-privacy?branch=master)
+[![npm version](https://badge.fury.io/js/differential-privacy.svg)](https://badge.fury.io/js/differential-privacy)
+![Build Passing](https://github.com/gittyeric/differential-privacy/actions/workflows/job.yaml/badge.svg)
+
+
 This NPM library implements the secure Laplace mechanism for Global Differential Privacy that allows you to protect the privacy of any users (or entities) in some data set while still allowing untrusted aggregations over their private data.  Differential attacks are ways to steal data from APIs and derive information about individual users through only aggregate information.  Differential privacy helps to prevent this while also providing an anonymization scheme with mathematical guarantees.
 
 # Features
