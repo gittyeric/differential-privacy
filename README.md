@@ -5,13 +5,14 @@
 ![Build Passing](https://github.com/gittyeric/differential-privacy/actions/workflows/job.yaml/badge.svg)
 
 
-This NPM library implements the secure Laplace mechanism for Global Differential Privacy that allows you to protect the privacy of any users (or entities) in some data set while still allowing untrusted aggregations over their private data.  Differential attacks are ways to steal data from APIs and derive information about individual users through only aggregate information.  Differential privacy helps to prevent this while also providing an anonymization scheme with mathematical guarantees.
+This NPM library implements the secure [Laplace mechanism](https://programming-dp.com/notebooks/ch3.html#the-laplace-mechanism) for Global Differential Privacy that allows you to protect the privacy of any users (or entities) in some data set while still allowing untrusted aggregations over their private data.  Differential attacks are ways to steal data from APIs and derive information about individual users through only aggregate information.  Differential privacy helps to prevent this while also providing an anonymization scheme with mathematical guarantees.
 
 # Features
 
 - Works for any JS or TS function that operates on a countable datastructure and returns a number!
 - Built-in Dataset implementations for arrays and associative arrays
 - Plugs for custom Datasets
+- 100% Code Coverage in Tests!
 
 # Definitions
 
